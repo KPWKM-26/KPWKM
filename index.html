@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>KPWKM ATTENDANCE</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0a2f6c" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="apple-touch-icon" href="https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        /* ===== ROOT ===== */
+        :root {
+            --kpwkm: #0a2f6c;
+            --kpwkm-light: #1a4a8a;
+            --kpwkm-accent: #2d6cb4;
+            --kpwkm-gold: #c9a84c;
+            --white: #ffffff;
+            --bg: #f2f6fc;
+            --surface: #ffffff;
+            --text: #1a2332;
+            --text-muted: #5a6a7e;
+            --border: #dce3ed;
+            --shadow: 0 2px 16px rgba(10, 47, 108, 0.08);
+            --shadow-lg: 0 8px 40px rgba(10, 47, 108, 0.14);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --success: #0f8b5e;
+            --danger: #c62828;
+            --warning: #b45309;
+            --info: #1a6bb0;
+            --transition: 0.25s ease;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--kpwkm-accent);
+            border-radius: 99px;
+        }
+
+        /* ===== HEADER (Logo Tengah, Butang Melintang) ===== */
+        header {
+            background: var(--kpwkm);
+            padding: 16px 20px 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(10, 47, 108, 0.25);
+            flex-shrink: 0;
+        }
+        .header-top {
+            max-width: 1360px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .logo-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+        .logo-center img {
+            height: 150px;
+            width: auto;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+        .logo-center img:hover {
+            transform: scale(1.04);
+        }
+        .logo-center h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+        .logo-center span {
+            font-weight: 400;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: -4px;
+        }
+
+        /* ===== NAV HORIZONTAL ===== */
+        .nav-horizontal {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .nav-btn {
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.75);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+        .nav-btn.active {
+            background: #fff;
+            color: var(--kpwkm);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+        .nav-btn i {
+            font-size: 0.85rem;
+        }
+
+        /* ===== MAIN ===== */
+        main {
+            flex: 1;
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 24px 20px 40px;
+            width: 100%;
+        }
+        .page {
+            display: none;
+            animation: fadeUp 0.35s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px 28px;
+            border: 1px solid var(--border);
+            transition: box-shadow var(--transition);
+        }
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--kpwkm);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid var(--kpwkm-gold);
+            padding-bottom: 10px;
+        }
+        .card-title i {
+            color: var(--kpwkm-gold);
+        }
+
+        /* ===== SCAN HERO ===== */
+        .scan-hero {
+            background: linear-gradient(135deg, var(--kpwkm) 0%, var(--kpwkm-light) 100%);
+            border-radius: var(--radius);
+            padding: 36px 28px;
+            text-align: center;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .scan-hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .nfc-icon-wrap {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            position: relative;
+            animation: pulse-ring 2.4s ease-in-out infinite;
+        }
+        @keyframes pulse-ring {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.25);
+            }
+            50% {
+                box-shadow: 0 0 0 20px rgba(255, 255, 255, 0.06);
+            }
+        }
+        .nfc-icon-wrap i {
+            font-size: 2.2rem;
+            color: #fff;
+        }
+        .scan-hero h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            position: relative;
+        }
+        .scan-hero p {
+            opacity: 0.8;
+            font-size: 0.88rem;
+            position: relative;
+        }
+        .nfc-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            max-width: 440px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+        .nfc-input {
+            flex: 1;
+            padding: 13px 18px;
+            border-radius: 30px;
+            border: none;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+            outline: none;
+            backdrop-filter: blur(6px);
+            transition: background var(--transition);
+        }
+        .nfc-input::placeholder {
+            color: rgba(255, 255, 255, 0.55);
+        }
+        .nfc-input:focus {
+            background: rgba(255, 255, 255, 0.28);
+        }
+        .scan-btn {
+            padding: 13px 24px;
+            border-radius: 30px;
+            border: none;
+            background: #fff;
+            color: var(--kpwkm);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .scan-btn:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        .scan-btn:disabled {
+            opacity: 0.5;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        /* ===== SCAN RESULT ===== */
+        .scan-result {
+            padding: 18px 22px;
+            border-radius: var(--radius-sm);
+            animation: slideIn 0.4s ease;
+            display: none;
+            border-left: 4px solid;
+            margin-bottom: 24px;
+            background: var(--surface);
+            box-shadow: var(--shadow);
+        }
+        .scan-result.show {
+            display: block;
+        }
+        .scan-result.success {
+            border-color: var(--success);
+        }
+        .scan-result.error {
+            border-color: var(--danger);
+        }
+        .scan-result.warning {
+            border-color: var(--warning);
+        }
+        .scan-result.info {
+            border-color: var(--info);
+        }
+        .result-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+        .result-msg {
+            font-size: 0.9rem;
+            margin-top: 4px;
+            color: var(--text-muted);
+        }
+        .result-detail {
+            margin-top: 8px;
+            padding: 10px 14px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 4px 16px;
+        }
+        .result-detail .label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .result-detail .value {
+            font-weight: 600;
+        }
+
+        /* ===== SESSION GRID ===== */
+        .session-grid {
+            display: grid;
+            gap: 10px;
+        }
+        .session-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .session-item:hover {
+            border-color: var(--kpwkm-accent);
+        }
+        .session-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            background: var(--kpwkm);
+            color: #fff;
+        }
+        .session-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .session-name {
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+        .session-meta {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .session-status {
+            text-align: right;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+        .dot-live {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: blink 1.4s infinite;
+            margin-right: 4px;
+        }
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.25;
+            }
+        }
+        .status-pill {
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .pill-green {
+            background: #d4edda;
+            color: #0b5e3a;
+        }
+        .pill-red {
+            background: #f8d7da;
+            color: #9b1f2c;
+        }
+        .pill-blue {
+            background: #d1e7ff;
+            color: #0a4b7a;
+        }
+        .pill-gold {
+            background: #fef3d7;
+            color: #7a5d1a;
+        }
+        .pill-gray {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        /* ===== TABLE ===== */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: var(--radius-sm);
+            margin-top: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        thead th {
+            background: var(--kpwkm);
+            color: #fff;
+            padding: 11px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        thead th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+        thead th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+        tbody tr {
+            transition: background 0.15s;
+            border-bottom: 1px solid var(--border);
+        }
+        tbody tr:nth-child(even) {
+            background: #f8faff;
+        }
+        tbody tr:hover {
+            background: #eaf0fa;
+        }
+        td {
+            padding: 10px 14px;
+            vertical-align: middle;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        .empty-state i {
+            font-size: 2.2rem;
+            opacity: 0.3;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+
+        /* ===== FORMS ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media(max-width:600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.2px;
+        }
+        input,
+        select,
+        textarea {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text);
+            background: var(--bg);
+            outline: none;
+            transition: border-color var(--transition), background var(--transition);
+            width: 100%;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--kpwkm-accent);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(45, 108, 180, 0.12);
+        }
+        input::placeholder {
+            color: #aab3c4;
+        }
+        .btn {
+            padding: 10px 22px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--kpwkm);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--kpwkm-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(10, 47, 108, 0.25);
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+        .btn-warning {
+            background: var(--warning);
+            color: #fff;
+        }
+        .btn-warning:hover {
+            opacity: 0.9;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--kpwkm);
+            color: var(--kpwkm);
+        }
+        .btn-outline:hover {
+            background: var(--kpwkm);
+            color: #fff;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            border-radius: 20px;
+        }
+        .btn-gold {
+            background: var(--kpwkm-gold);
+            color: #fff;
+        }
+        .btn-gold:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 7px 16px;
+            border-radius: 20px;
+            border: 1.5px solid var(--border);
+            background: var(--bg);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.78rem;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            background: var(--kpwkm);
+            color: #fff;
+            border-color: var(--kpwkm);
+        }
+        .tab-btn:hover:not(.active) {
+            background: var(--border);
+        }
+
+        /* ===== ADMIN ===== */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            padding: 18px 20px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--kpwkm), var(--kpwkm-light));
+            color: #fff;
+            text-align: center;
+        }
+        .stat-card.green {
+            background: linear-gradient(135deg, #0b6e4a, #0f8b5e);
+        }
+        .stat-card.gold {
+            background: linear-gradient(135deg, #8a6d2b, #c9a84c);
+        }
+        .stat-card.red {
+            background: linear-gradient(135deg, #9b1f2c, #c62828);
+        }
+        .stat-num {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+        .stat-label {
+            font-size: 0.78rem;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(10, 20, 40, 0.55);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.94) translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--kpwkm);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .modal-actions .btn {
+            flex: 0 1 auto;
+        }
+
+        /* ===== TOAST ===== */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 360px;
+            width: 100%;
+        }
+        .toast-item {
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            box-shadow: var(--shadow-lg);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-left: 4px solid var(--success);
+            animation: toastIn 0.35s ease;
+        }
+        .toast-item.error {
+            border-color: var(--danger);
+        }
+        .toast-item.warning {
+            border-color: var(--warning);
+        }
+        .toast-item.info {
+            border-color: var(--info);
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            border: none;
+            border-top: 1.5px solid var(--border);
+            margin: 18px 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media(max-width:768px) {
+            header {
+                padding: 12px 14px 8px;
+            }
+            .logo-center img {
+                height: 60px;
+            }
+            .logo-center h1 {
+                font-size: 1.4rem;
+            }
+            .logo-center span {
+                font-size: 0.65rem;
+            }
+            .nav-btn {
+                padding: 6px 10px;
+                font-size: 0.68rem;
+            }
+            .nav-btn i {
+                font-size: 0.7rem;
+            }
+            main {
+                padding: 16px 12px 32px;
+            }
+            .card {
+                padding: 16px 18px;
+            }
+            .scan-hero {
+                padding: 24px 16px;
+            }
+            .nfc-input-group {
+                flex-direction: column;
+            }
+            .scan-btn {
+                justify-content: center;
+                padding: 12px;
+            }
+            .admin-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .modal {
+                padding: 20px;
+            }
+        }
+        @media(max-width:480px) {
+            .logo-center img {
+                height: 48px;
+            }
+            .logo-center h1 {
+                font-size: 1.1rem;
+            }
+            .nav-btn {
+                padding: 5px 8px;
+                font-size: 0.6rem;
+                gap: 4px;
+            }
+            .nav-btn i {
+                font-size: 0.6rem;
+            }
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== FOOTER ===== */
+        .footer-note {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+        .footer-note strong {
+            color: var(--kpwkm);
+        }
+
+        /* ===== HIDDEN TERMINATE ===== */
+        .terminate-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            background: var(--danger);
+            color: #fff;
+        }
+        .terminate-badge.active {
+            background: var(--danger);
+        }
+        .terminate-badge.inactive {
+            background: var(--success);
+        }
+
+        /* ===== MISC ===== */
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .mt-12 {
+            margin-top: 12px;
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+        .mb-12 {
+            margin-bottom: 12px;
+        }
+        .text-muted {
+            color: var(--text-muted);
+        }
+        .text-small {
+            font-size: 0.78rem;
+        }
+        .fw-700 {
+            font-weight: 700;
+        }
+        .code {
+            font-family: monospace;
+            font-size: 0.8rem;
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .badge-uid {
+            font-family: monospace;
+            font-size: 0.7rem;
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        /* install banner */
+        .install-banner {
+            background: var(--kpwkm);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .install-banner.show {
+            display: flex;
+        }
+        .install-banner p {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .install-banner .btn {
+            background: #fff;
+            color: var(--kpwkm);
+        }
+        .install-banner .btn:hover {
+            background: var(--kpwkm-gold);
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER (Logo Tengah + Butang Melintang) ===== -->
+    <header>
+        <div class="header-top">
+            <div class="logo-center">
+                <img src="https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp" alt="KPWKM" />
+                <h1>KPWKM ATTENDANCE</h1>
+                <span>Sistem Kehadiran Rasmi</span>
+            </div>
+            <nav class="nav-horizontal">
+                <button class="nav-btn active" onclick="showPage('scan')" id="nav-scan"><i class="fas fa-wifi"></i> Imbas Kad</button>
+                <button class="nav-btn" onclick="showPage('daftar')" id="nav-daftar"><i class="fas fa-user-plus"></i> Daftar</button>
+                <button class="nav-btn" onclick="showPage('daftar-sekaligus')" id="nav-daftar-sekaligus"><i class="fas fa-users"></i> Daftar Sekaligus</button>
+                <button class="nav-btn" onclick="showPage('sesi')" id="nav-sesi"><i class="fas fa-clock"></i> Sesi Hari Ini</button>
+                <button class="nav-btn" onclick="showPage('pegawai')" id="nav-pegawai"><i class="fas fa-id-badge"></i> Senarai Pegawai</button>
+                <button class="nav-btn" onclick="showPage('admin')" id="nav-admin"><i class="fas fa-shield-halved"></i> Admin</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== INSTALL BANNER ===== -->
+    <div class="install-banner" id="installBanner">
+        <p><i class="fas fa-mobile-screen-button"></i> Install KPWKM Attendance untuk akses pantas</p>
+        <button class="btn btn-sm" onclick="installApp()"><i class="fas fa-download"></i> Install</button>
+    </div>
+
+    <!-- ===== MAIN ===== -->
+    <main>
+
+        <!-- ===== IMBAS NFC ===== -->
+        <div class="page active" id="page-scan">
+            <div class="scan-hero">
+                <div class="nfc-icon-wrap"><i class="fas fa-wifi"></i></div>
+                <h2>Imbas Kad Ic Anda</h2>
+                <p>Tap kad untuk Check In / Check Out</p>
+                <div class="nfc-input-group">
+                    <input type="text" class="nfc-input" id="nfcInput" placeholder="Tap atau taip UID..." autofocus autocomplete="off" />
+                    <button class="scan-btn" id="scanBtn" onclick="doScan()"><i class="fas fa-bolt"></i> Imbas</button>
+                </div>
+            </div>
+
+            <div id="scanResult" class="scan-result"></div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-circle-dot"></i> Sedang Bertugas
+                    <span id="liveCount" style="margin-left:auto;font-size:0.78rem;color:var(--text-muted);font-weight:400;"></span>
+                </div>
+                <div id="liveSessions" class="session-grid">
+                    <div class="empty-state"><i class="fas fa-door-open"></i><p>Tiada pegawai bertugas</p></div>
+                </div>
+            </div>
+
+            <div class="footer-note">
+                &copy; <span id="current-year"></span> KPWKM Attendance &mdash; Sistem Kehadiran Rasmi
+            </div>
+        </div>
+
+        <!-- ===== DAFTAR ===== -->
+        <div class="page" id="page-daftar">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-user-plus"></i> Daftar Pegawai Baru</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nama Penuh</label>
+                        <input type="text" id="regName" placeholder="Nama penuh..." />
+                    </div>
+                    <div class="form-group">
+                        <label>No. IC</label>
+                        <input type="text" id="regIc" placeholder="cth: 850101-10-1234" />
+                    </div>
+                    <div class="form-group">
+                        <label>Jawatan</label>
+                        <input type="text" id="regPosition" placeholder="cth: Penolong Pegawai" />
+                    </div>
+                    <div class="form-group">
+                        <label>UID NFC</label>
+                        <input type="text" id="regNfc" placeholder="Tap atau taip UID..." autocomplete="off" />
+                    </div>
+                </div>
+                <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+                    <button class="btn btn-primary" onclick="registerStaff()"><i class="fas fa-plus-circle"></i> Daftar Sekarang</button>
+                    <button class="btn btn-success" onclick="openBulkRegisterModal()"><i class="fas fa-file-upload"></i> Daftar Sekaligus</button>
+                    <button class="btn btn-warning" onclick="openAssignNfcModal()"><i class="fas fa-id-card"></i> Setkan UID</button>
+                </div>
+                <hr class="divider" />
+                <div style="background:#f0f7ff;border-radius:10px;padding:14px 18px;font-size:0.82rem;color:var(--text-muted);line-height:1.8">
+                    <b style="color:var(--kpwkm)"><i class="fas fa-info-circle"></i> Panduan:</b><br />
+                    • Setiap pegawai memerlukan <b>UID NFC</b> untuk check in/out.<br />
+                    • UID boleh ditetapkan semasa daftar atau kemudian melalui <b>Setkan UID</b>.<br />
+                    • Daftar sekaligus memerlukan fail Excel dengan kolum: <b>Nama | No. IC | Jawatan</b>.
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DAFTAR SEKALIGUS ===== -->
+        <div class="page" id="page-daftar-sekaligus">
+            <div class="card">
+                <div class="card-title"><i class="fas fa-users"></i> Daftar Pegawai Sekaligus</div>
+                <div style="background:#f0f7ff;border-radius:10px;padding:12px 16px;font-size:0.85rem;margin-bottom:16px;">
+                    <b><i class="fas fa-info-circle"></i> Format Excel:</b><br />
+                    Kolum: <code>Nama | No. IC | Jawatan</code><br />
+                    Baris pertama = header (akan dilangkau)
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label>Upload File Excel (.xlsx)</label>
+                        <input type="file" id="bulkExcelFile" accept=".xlsx,.xls" onchange="previewBulkExcel()" />
+                    </div>
+                    <div class="form-group">
+                        <label>Jawatan (default untuk semua)</label>
+                        <input type="text" id="bulkPosition" placeholder="cth: Pembantu Tadbir" />
+                    </div>
+                </div>
+                <div id="bulkPreview" style="margin-top:14px;max-height:240px;overflow-y:auto;font-size:0.82rem;border:1.5px solid var(--border);border-radius:8px;display:none;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <thead><tr style="background:var(--kpwkm);color:#fff;"><th style="padding:8px;">Nama</th><th style="padding:8px;">No. IC</th><th style="padding:8px;">Jawatan</th></tr></thead>
+                        <tbody id="bulkPreviewBody"></tbody>
+                    </table>
+                </div>
+                <div id="bulkPreviewCount" style="font-size:0.82rem;color:var(--text-muted);margin-top:8px;"></div>
+                <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+                    <button class="btn btn-success" onclick="submitBulkRegister()"><i class="fas fa-upload"></i> Daftar Semua</button>
+                    <button class="btn btn-outline" onclick="showPage('daftar')"><i class="fas fa-arrow-left"></i> Kembali</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SESI HARI INI ===== -->
+        <div class="page" id="page-sesi">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-calendar-day"></i> Sesi Kehadiran Hari Ini
+                    <button class="btn btn-outline btn-sm" style="margin-left:auto;" onclick="loadTodaySessions()"><i class="fas fa-rotate"></i> Muat Semula</button>
+                </div>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="filterSessions('semua')">Semua</button>
+                    <button class="tab-btn" onclick="filterSessions('aktif')">Aktif</button>
+                    <button class="tab-btn" onclick="filterSessions('selesai')">Selesai</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Nama</th><th>Jawatan</th><th>UID</th><th>Masa Masuk</th><th>Masa Keluar</th><th>Jumlah Bekerja</th><th>Status</th></tr>
+                        </thead>
+                        <tbody id="sessionsBody">
+                            <tr><td colspan="7" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Memuatkan...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SENARAI PEGAWAI ===== -->
+        <div class="page" id="page-pegawai">
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-id-badge"></i> Senarai Pegawai
+                    <button class="btn btn-outline btn-sm" style="margin-left:auto;" onclick="loadStaff()"><i class="fas fa-rotate"></i> Muat Semula</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Nama</th><th>No. IC</th><th>Jawatan</th><th>UID NFC</th><th>Status</th><th>Tarikh Daftar</th></tr>
+                        </thead>
+                        <tbody id="staffBody">
+                            <tr><td colspan="6" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Memuatkan...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ADMIN ===== -->
+        <div class="page" id="page-admin">
+            <div id="adminLogin" class="card" style="max-width:400px;margin:0 auto;">
+                <div class="card-title"><i class="fas fa-lock"></i> Log Masuk Admin</div>
+                <div class="form-group">
+                    <label>Kata Laluan Admin</label>
+                    <input type="password" id="adminPass" onkeydown="if(event.key==='Enter') adminLogin()" />
+                </div>
+                <div style="margin-top:16px;">
+                    <button class="btn btn-primary" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Log Masuk</button>
+                </div>
+            </div>
+
+            <div id="adminPanel" style="display:none;">
+                <div class="flex-between" style="margin-bottom:20px;">
+                    <h2 style="font-size:1.1rem;font-weight:800;color:var(--kpwkm);"><i class="fas fa-shield-halved"></i> Panel Admin</h2>
+                    <button class="btn btn-danger btn-sm" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Log Keluar</button>
+                </div>
+
+                <div class="admin-grid">
+                    <div class="stat-card"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Jumlah Pegawai</div></div>
+                    <div class="stat-card green"><div class="stat-num" id="statAktif">—</div><div class="stat-label">Bertugas Hari Ini</div></div>
+                    <div class="stat-card gold"><div class="stat-num" id="statSelesai">—</div><div class="stat-label">Selesai Hari Ini</div></div>
+                    <div class="stat-card red"><div class="stat-num" id="statTerminated">—</div><div class="stat-label">Ditamatkan</div></div>
+                </div>
+
+                <!-- Download Excel -->
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-title"><i class="fas fa-file-excel"></i> Muat Turun Laporan</div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;">
+                        <div class="form-group" style="margin:0;min-width:160px;">
+                            <label style="font-size:0.78rem;">Tempoh</label>
+                            <select id="downloadPeriod" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:0.85rem;">
+                                <option value="harian">Harian</option>
+                                <option value="mingguan">Mingguan</option>
+                                <option value="bulanan">Bulanan</option>
+                                <option value="tahunan">Tahunan</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0;min-width:160px;">
+                            <label style="font-size:0.78rem;">Tarikh</label>
+                            <input type="date" id="downloadDate" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:0.85rem;" />
+                        </div>
+                        <button class="btn btn-success" onclick="downloadExcel()"><i class="fas fa-download"></i> Download</button>
+                    </div>
+                    <div style="font-size:0.78rem;color:var(--text-muted);">
+                        <i class="fas fa-info-circle"></i> Pilih tempoh dan tarikh. Untuk bulanan/tahunan, tarikh akan digunakan sebagai rujukan.
+                    </div>
+                </div>
+
+                <!-- Cari & Padam -->
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-title"><i class="fas fa-search"></i> Cari &amp; Urus Pegawai</div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                        <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+                            <label style="font-size:0.78rem;">Cari Nama / IC / UID</label>
+                            <input type="text" id="adminSearch" placeholder="Taip untuk cari..." oninput="filterAdminStaff()" style="padding:8px 12px;" />
+                        </div>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:18px;">
+                            <button class="btn btn-danger btn-sm" onclick="deleteSelectedStaff()"><i class="fas fa-trash"></i> Padam Dipilih</button>
+                            <button class="btn btn-warning btn-sm" onclick="deleteAttendanceByPeriod()"><i class="fas fa-eraser"></i> Padam Rekod Kehadiran</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap" style="margin-top:12px;">
+                        <table>
+                            <thead>
+                                <tr><th style="width:32px;"><input type="checkbox" id="selectAllStaff" onchange="toggleSelectAllStaff()" /></th><th>Nama</th><th>No. IC</th><th>Jawatan</th><th>UID</th><th>Status</th><th>Bekerja</th><th>Tindakan</th></tr>
+                            </thead>
+                            <tbody id="adminStaffBody">
+                                <tr><td colspan="8" class="empty-state">Tiada data</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Padam rekod kehadiran mengikut tempoh -->
+                <div class="card" style="margin-bottom:20px;">
+                    <div class="card-title"><i class="fas fa-eraser"></i> Padam Rekod Kehadiran</div>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+                        <div class="form-group" style="margin:0;min-width:140px;">
+                            <label style="font-size:0.78rem;">Tempoh</label>
+                            <select id="deletePeriod" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:0.85rem;">
+                                <option value="mingguan">Mingguan</option>
+                                <option value="bulanan">Bulanan</option>
+                                <option value="tahunan">Tahunan</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0;min-width:140px;">
+                            <label style="font-size:0.78rem;">Rujukan Tarikh</label>
+                            <input type="date" id="deleteDate" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-size:0.85rem;" />
+                        </div>
+                        <button class="btn btn-danger" onclick="deleteAttendanceByPeriod()"><i class="fas fa-trash-alt"></i> Padam Rekod</button>
+                    </div>
+                </div>
+
+                <!-- Terminate hidden (akan dipaparkan melalui shortcut) -->
+                <div id="terminateSection" style="display:none;margin-top:16px;">
+                    <div class="card" style="border:2px solid var(--danger);">
+                        <div class="card-title" style="color:var(--danger);"><i class="fas fa-ban"></i> ⚠ Terminate Pegawai (Hidden)</div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                            <div class="form-group" style="margin:0;flex:1;min-width:160px;">
+                                <label style="font-size:0.78rem;">UID / Nama / IC</label>
+                                <input type="text" id="terminateSearch" placeholder="Cari pegawai..." oninput="filterTerminateStaff()" style="padding:8px 12px;" />
+                            </div>
+                            <div style="padding-top:18px;">
+                                <button class="btn btn-danger" onclick="confirmTerminate()"><i class="fas fa-user-slash"></i> Terminate</button>
+                                <button class="btn btn-success" onclick="confirmReactivate()"><i class="fas fa-user-check"></i> Aktifkan Semula</button>
+                            </div>
+                        </div>
+                        <div class="table-wrap" style="margin-top:12px;">
+                            <table>
+                                <thead><tr><th>Nama</th><th>IC</th><th>Jawatan</th><th>UID</th><th>Status</th></tr></thead>
+                                <tbody id="terminateStaffBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Assign UID Modal -->
+    <div class="modal-overlay" id="assignNfcModal">
+        <div class="modal">
+            <div class="modal-title"><i class="fas fa-id-card"></i> Setkan UID NFC</div>
+            <div class="form-group">
+                <label>Cari Pegawai (Nama / IC)</label>
+                <input type="text" id="assignSearch" placeholder="Taip nama atau IC..." oninput="filterAssignStaff()" />
+            </div>
+            <div style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;margin-bottom:12px;">
+                <table style="width:100%;font-size:0.82rem;">
+                    <tbody id="assignStaffList"></tbody>
+                </table>
+            </div>
+            <div class="form-group">
+                <label>UID NFC Baharu</label>
+                <input type="text" id="assignNfcInput" placeholder="Tap atau taip UID..." autocomplete="off" />
+            </div>
+            <div id="assignMemberInfo" style="background:#f1f5f9;padding:8px 12px;border-radius:8px;font-size:0.85rem;margin-top:8px;min-height:32px;"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('assignNfcModal')">Batal</button>
+                <button class="btn btn-warning" onclick="submitAssignNfc()"><i class="fas fa-save"></i> Tetapkan UID</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-title" style="color:var(--danger);"><i class="fas fa-triangle-exclamation"></i> Padam Pegawai</div>
+            <input type="hidden" id="deleteStaffId" />
+            <p>Anda pasti mahu memadam <b id="deleteStaffName"></b>? Tindakan ini tidak boleh dibatalkan.</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('deleteModal')">Batal</button>
+                <button class="btn btn-danger" onclick="confirmDeleteStaff()">Ya, Padam</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Staff Modal -->
+    <div class="modal-overlay" id="editStaffModal">
+        <div class="modal">
+            <div class="modal-title"><i class="fas fa-user-pen"></i> Edit Pegawai</div>
+            <input type="hidden" id="editStaffId" />
+            <div class="form-grid">
+                <div class="form-group"><label>Nama</label><input type="text" id="editName" /></div>
+                <div class="form-group"><label>No. IC</label><input type="text" id="editIc" /></div>
+                <div class="form-group"><label>Jawatan</label><input type="text" id="editPosition" /></div>
+                <div class="form-group"><label>UID NFC</label><input type="text" id="editNfc" /></div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('editStaffModal')">Batal</button>
+                <button class="btn btn-primary" onclick="submitEditStaff()"><i class="fas fa-save"></i> Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terminate Confirm Modal (hidden) -->
+    <div class="modal-overlay" id="terminateConfirmModal">
+        <div class="modal">
+            <div class="modal-title" style="color:var(--danger);"><i class="fas fa-user-slash"></i> Sahkan Termination</div>
+            <input type="hidden" id="terminateStaffId" />
+            <p>Anda pasti mahu <b>menamatkan</b> akses untuk <b id="terminateStaffName"></b>?</p>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-top:8px;">Pegawai tidak akan dapat check in/out sehingga diaktifkan semula.</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('terminateConfirmModal')">Batal</button>
+                <button class="btn btn-danger" onclick="executeTerminate()"><i class="fas fa-ban"></i> Terminate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reactivate Confirm Modal -->
+    <div class="modal-overlay" id="reactivateConfirmModal">
+        <div class="modal">
+            <div class="modal-title" style="color:var(--success);"><i class="fas fa-user-check"></i> Aktifkan Semula</div>
+            <input type="hidden" id="reactivateStaffId" />
+            <p>Anda pasti mahu mengaktifkan semula <b id="reactivateStaffName"></b>?</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('reactivateConfirmModal')">Batal</button>
+                <button class="btn btn-success" onclick="executeReactivate()"><i class="fas fa-check"></i> Aktifkan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Filename Modal -->
+    <div class="modal-overlay" id="downloadModal">
+        <div class="modal">
+            <div class="modal-title"><i class="fas fa-file-excel"></i> Nama Fail</div>
+            <div class="form-group">
+                <label>Nama Fail</label>
+                <input type="text" id="downloadFilename" placeholder="cth: Kehadiran Julai 2026" />
+            </div>
+            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">Kosongkan untuk nama automatik</div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeModal('downloadModal')">Batal</button>
+                <button class="btn btn-success" onclick="confirmDownload()"><i class="fas fa-download"></i> Muat Turun</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toast"></div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ============================================================
+        //  KONFIGURASI
+        // ============================================================
+        const CONFIG = {
+            // GANTI dengan URL Google Apps Script Web App anda
+            API_BASE: 'https://script.google.com/macros/s/AKfycbwyuP82cfqSf4iFCtq0ZORvSWMjtpual2E3wEJa8PPDW2hsO-pILgw4eNe1_2gCwYMxTg/exec'
+        };
+
+        // ============================================================
+        //  STATE
+        // ============================================================
+        let allStaff = [];
+        let allSessions = [];
+        let sessionFilter = 'semua';
+        let isScanning = false;
+        let adminLoggedIn = false;
+        let adminStaffList = [];
+        let adminSelectedIds = [];
+
+        // ============================================================
+        //  HELPERS
+        // ============================================================
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toast');
+            const el = document.createElement('div');
+            el.className = `toast-item ${type}`;
+            el.textContent = msg;
+            container.appendChild(el);
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transition = 'opacity 0.4s';
+                setTimeout(() => el.remove(), 400);
+            }, 3200);
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function formatTime(dateStr) {
+            if (!dateStr) return '—';
+            try {
+                const d = new Date(dateStr);
+                return d.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+            } catch { return dateStr; }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '—';
+            try {
+                const d = new Date(dateStr);
+                return d.toLocaleDateString('ms-MY', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            } catch { return dateStr; }
+        }
+
+        function formatDuration(minutes) {
+            if (minutes == null || isNaN(minutes)) return '—';
+            const mins = Math.round(minutes);
+            const h = Math.floor(mins / 60);
+            const m = mins % 60;
+            if (h === 0) return `${m} minit`;
+            if (m === 0) return `${h} jam`;
+            return `${h} jam ${m} minit`;
+        }
+
+        function getToday() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function getNowISO() {
+            return new Date().toISOString();
+        }
+
+        function apiFetch(action, body = {}) {
+            const url = CONFIG.API_BASE + '?action=' + encodeURIComponent(action);
+            return fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            }).then(r => r.json());
+        }
+
+        // ============================================================
+        //  NAVIGATION
+        // ============================================================
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+            const pg = document.getElementById('page-' + page);
+            if (pg) pg.classList.add('active');
+
+            const nav = document.getElementById('nav-' + page);
+            if (nav) nav.classList.add('active');
+
+            if (page === 'scan') { loadLiveSessions();
+                document.getElementById('nfcInput').focus(); }
+            if (page === 'sesi') loadTodaySessions();
+            if (page === 'pegawai') loadStaff();
+            if (page === 'admin') checkAdminStatus();
+            if (page === 'daftar') document.getElementById('regNfc').focus();
+        }
+
+        // ============================================================
+        //  NFC SCAN (Check In / Check Out)
+        // ============================================================
+        const nfcInput = document.getElementById('nfcInput');
+        nfcInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doScan(); });
+
+        let scanTimeout = null;
+        nfcInput.addEventListener('input', () => {
+            clearTimeout(scanTimeout);
+            scanTimeout = setTimeout(() => {
+                if (nfcInput.value.trim().length > 2) doScan();
+            }, 350);
+        });
+
+        async function doScan() {
+            if (isScanning) { showToast('Sila tunggu...', 'warning'); return; }
+            const uid = nfcInput.value.trim();
+            if (!uid) { showToast('Sila tap atau taip UID', 'warning'); return; }
+
+            isScanning = true;
+            nfcInput.disabled = true;
+            document.getElementById('scanBtn').disabled = true;
+
+            try {
+                const data = await apiFetch('scan', { uid });
+
+                const resultEl = document.getElementById('scanResult');
+                resultEl.className = 'scan-result show';
+
+                if (!data.success) {
+                    resultEl.classList.add('error');
+                    resultEl.innerHTML = `
+                        <div class="result-name" style="color:var(--danger);"><i class="fas fa-circle-xmark"></i> Gagal</div>
+                        <div class="result-msg">${data.message}</div>
+                    `;
+                    showToast(data.message, 'error');
+                    nfcInput.value = '';
+                    return;
+                }
+
+                const s = data.session;
+                const isCheckIn = !s.check_out;
+
+                resultEl.classList.add(isCheckIn ? 'success' : 'info');
+
+                let statusLabel = isCheckIn ? '✅ CHECK IN' : '✅ CHECK OUT';
+                let statusColor = isCheckIn ? 'var(--success)' : 'var(--info)';
+
+                let details = `
+                    <div class="result-detail">
+                        <span class="label">Nama</span><span class="value">${s.name}</span>
+                        <span class="label">Jawatan</span><span class="value">${s.position || '—'}</span>
+                        <span class="label">UID</span><span class="value"><span class="code">${s.uid}</span></span>
+                        <span class="label">Masuk</span><span class="value">${formatTime(s.check_in)}</span>
+                        ${s.check_out ? `<span class="label">Keluar</span><span class="value">${formatTime(s.check_out)}</span>` : ''}
+                        ${s.hours_worked != null ? `<span class="label">Jumlah Bekerja</span><span class="value" style="color:var(--kpwkm);font-weight:700;">${formatDuration(s.hours_worked)}</span>` : ''}
+                    </div>
+                `;
+
+                resultEl.innerHTML = `
+                    <div class="result-name" style="color:${statusColor};">${statusLabel}</div>
+                    <div class="result-msg">${data.message}</div>
+                    ${details}
+                `;
+
+                showToast(data.message, isCheckIn ? 'success' : 'info');
+                nfcInput.value = '';
+
+                // Refresh
+                loadLiveSessions();
+                if (document.getElementById('page-sesi').classList.contains('active')) loadTodaySessions();
+                if (document.getElementById('page-admin').classList.contains('active')) { checkAdminStatus(); }
+
+            } catch (e) {
+                showToast('Ralat sambungan: ' + e.message, 'error');
+            } finally {
+                setTimeout(() => {
+                    nfcInput.disabled = false;
+                    document.getElementById('scanBtn').disabled = false;
+                    nfcInput.focus();
+                    isScanning = false;
+                }, 800);
+            }
+        }
+
+        // ============================================================
+        //  LIVE SESSIONS
+        // ============================================================
+        async function loadLiveSessions() {
+            try {
+                const data = await apiFetch('get_today_sessions');
+                const sessions = data.sessions || [];
+                const active = sessions.filter(s => !s.check_out);
+
+                document.getElementById('liveCount').textContent = `${active.length} orang bertugas`;
+
+                const container = document.getElementById('liveSessions');
+                if (!active.length) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-door-open"></i><p>Tiada pegawai bertugas sekarang</p></div>';
+                    return;
+                }
+
+                container.innerHTML = active.map(s => {
+                    const initials = (s.name || 'P').split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+                    return `
+                        <div class="session-item">
+                            <div class="session-avatar">${initials}</div>
+                            <div class="session-info">
+                                <div class="session-name">${s.name}</div>
+                                <div class="session-meta"><i class="fas fa-clock"></i> Masuk: ${formatTime(s.check_in)} &middot; ${s.position || '—'}</div>
+                            </div>
+                            <div class="session-status"><span class="dot-live"></span> Bertugas</div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // ============================================================
+        //  TODAY SESSIONS
+        // ============================================================
+        async function loadTodaySessions() {
+            try {
+                const data = await apiFetch('get_today_sessions');
+                allSessions = data.sessions || [];
+                renderSessions();
+            } catch (e) {
+                document.getElementById('sessionsBody').innerHTML =
+                    '<tr><td colspan="7" class="empty-state">Ralat memuatkan data</td></tr>';
+            }
+        }
+
+        function filterSessions(filter) {
+            sessionFilter = filter;
+            document.querySelectorAll('#page-sesi .tab-btn').forEach(b => b.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+            renderSessions();
+        }
+
+        function renderSessions() {
+            const tbody = document.getElementById('sessionsBody');
+            let data = allSessions;
+
+            if (sessionFilter === 'aktif') data = data.filter(s => !s.check_out);
+            else if (sessionFilter === 'selesai') data = data.filter(s => s.check_out);
+
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fas fa-inbox"></i><p>Tiada rekod</p></td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(s => {
+                const statusHtml = !s.check_out ?
+                    '<span class="status-pill pill-blue"><span class="dot-live"></span> Bertugas</span>' :
+                    '<span class="status-pill pill-green">✅ Selesai</span>';
+                return `
+                    <tr>
+                        <td><b>${s.name}</b></td>
+                        <td>${s.position || '—'}</td>
+                        <td><span class="code">${s.uid || '—'}</span></td>
+                        <td>${formatTime(s.check_in)}</td>
+                        <td>${s.check_out ? formatTime(s.check_out) : '<span style="color:var(--success);">masih bertugas</span>'}</td>
+                        <td>${s.hours_worked != null ? formatDuration(s.hours_worked) : '—'}</td>
+                        <td>${statusHtml}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        //  STAFF LIST
+        // ============================================================
+        async function loadStaff() {
+            try {
+                const data = await apiFetch('get_staff');
+                allStaff = data.staff || [];
+                renderStaff();
+            } catch (e) {
+                document.getElementById('staffBody').innerHTML =
+                    '<tr><td colspan="6" class="empty-state">Ralat memuatkan data</td></tr>';
+            }
+        }
+
+        function renderStaff() {
+            const tbody = document.getElementById('staffBody');
+            if (!allStaff.length) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-users"></i><p>Tiada pegawai</p></td></tr>';
+                return;
+            }
+            tbody.innerHTML = allStaff.map(s => {
+                const termBadge = s.terminated ?
+                    '<span class="terminate-badge active">Ditamatkan</span>' :
+                    '<span class="terminate-badge inactive">Aktif</span>';
+                return `
+                    <tr>
+                        <td><b>${s.name}</b></td>
+                        <td>${s.ic || '—'}</td>
+                        <td>${s.position || '—'}</td>
+                        <td><span class="code">${s.uid || '—'}</span></td>
+                        <td>${termBadge}</td>
+                        <td>${formatDate(s.created_at)}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        //  REGISTER STAFF
+        // ============================================================
+        async function registerStaff() {
+            const name = document.getElementById('regName').value.trim();
+            const ic = document.getElementById('regIc').value.trim();
+            const position = document.getElementById('regPosition').value.trim();
+            const uid = document.getElementById('regNfc').value.trim();
+
+            if (!name || !ic || !position || !uid) {
+                showToast('Sila lengkapkan semua maklumat', 'error');
+                return;
+            }
+
+            try {
+                const data = await apiFetch('register_staff', { name, ic, position, uid });
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    document.getElementById('regName').value = '';
+                    document.getElementById('regIc').value = '';
+                    document.getElementById('regPosition').value = '';
+                    document.getElementById('regNfc').value = '';
+                    loadStaff();
+                    if (document.getElementById('page-admin').classList.contains('active')) checkAdminStatus();
+                    document.getElementById('regNfc').focus();
+                } else {
+                    showToast(data.message, 'error');
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        document.getElementById('regNfc').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') registerStaff();
+        });
+
+        // ============================================================
+        //  BULK REGISTER
+        // ============================================================
+        let bulkRows = [];
+
+        function openBulkRegisterModal() {
+            bulkRows = [];
+            document.getElementById('bulkExcelFile').value = '';
+            document.getElementById('bulkPosition').value = '';
+            document.getElementById('bulkPreview').style.display = 'none';
+            document.getElementById('bulkPreviewCount').textContent = '';
+            document.getElementById('bulkPreviewBody').innerHTML = '';
+            showPage('daftar-sekaligus');
+        }
+
+        async function previewBulkExcel() {
+            const file = document.getElementById('bulkExcelFile').files[0];
+            if (!file) return;
+            try {
+                const data = await file.arrayBuffer();
+                let XLSX;
+                if (window.XLSX) {
+                    XLSX = window.XLSX;
+                } else {
+                    await new Promise((res, rej) => {
+                        const s = document.createElement('script');
+                        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+                        s.onload = res;
+                        s.onerror = rej;
+                        document.head.appendChild(s);
+                    });
+                    XLSX = window.XLSX;
+                }
+                const wb = XLSX.read(data, { type: 'array' });
+                const ws = wb.Sheets[wb.SheetNames[0]];
+                const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+                bulkRows = [];
+                for (let i = 1; i < raw.length; i++) {
+                    const row = raw[i];
+                    const name = (row[0] || '').toString().trim();
+                    const ic = (row[1] || '').toString().trim();
+                    const pos = (row[2] || '').toString().trim();
+                    if (name) bulkRows.push({ name, ic, position: pos });
+                }
+                const tbody = document.getElementById('bulkPreviewBody');
+                tbody.innerHTML = bulkRows.slice(0, 20).map(r =>
+                    `<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);">${r.name}</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);">${r.ic}</td><td style="padding:6px 8px;border-bottom:1px solid var(--border);">${r.position}</td></tr>`
+                ).join('');
+                document.getElementById('bulkPreview').style.display = '';
+                document.getElementById('bulkPreviewCount').textContent =
+                    `Dijumpai: ${bulkRows.length} rekod${bulkRows.length > 20 ? ' (menunjukkan 20 pertama)' : ''}`;
+            } catch (e) {
+                showToast('Gagal baca Excel: ' + e.message, 'error');
+            }
+        }
+
+        async function submitBulkRegister() {
+            if (!bulkRows.length) { showToast('Sila upload fail Excel dahulu', 'warning'); return; }
+            const defaultPos = document.getElementById('bulkPosition').value.trim();
+            try {
+                const data = await apiFetch('bulk_register', {
+                    rows: bulkRows,
+                    default_position: defaultPos
+                });
+                showToast(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    bulkRows = [];
+                    document.getElementById('bulkExcelFile').value = '';
+                    document.getElementById('bulkPreview').style.display = 'none';
+                    document.getElementById('bulkPreviewCount').textContent = '';
+                    document.getElementById('bulkPreviewBody').innerHTML = '';
+                    loadStaff();
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        //  ASSIGN UID (Setkan UID)
+        // ============================================================
+        let assignStaffList = [];
+        let assignSelectedId = null;
+
+        function openAssignNfcModal() {
+            assignSelectedId = null;
+            document.getElementById('assignSearch').value = '';
+            document.getElementById('assignNfcInput').value = '';
+            document.getElementById('assignMemberInfo').innerHTML = '';
+            openModal('assignNfcModal');
+            loadAssignStaffList();
+            setTimeout(() => document.getElementById('assignSearch').focus(), 200);
+        }
+
+        async function loadAssignStaffList() {
+            try {
+                const data = await apiFetch('get_staff');
+                assignStaffList = data.staff || [];
+                filterAssignStaff();
+            } catch (e) {
+                document.getElementById('assignStaffList').innerHTML =
+                    '<tr><td style="padding:8px;text-align:center;color:var(--text-muted);">Ralat memuatkan</td></tr>';
+            }
+        }
+
+        function filterAssignStaff() {
+            const q = document.getElementById('assignSearch').value.toLowerCase().trim();
+            const tbody = document.getElementById('assignStaffList');
+            let filtered = assignStaffList;
+            if (q) filtered = filtered.filter(s =>
+                (s.name || '').toLowerCase().includes(q) ||
+                (s.ic || '').includes(q)
+            );
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td style="padding:8px;text-align:center;color:var(--text-muted);">Tiada hasil</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(s => `
+                <tr style="cursor:pointer;${assignSelectedId === s.id ? 'background:#d1e7ff;' : ''}"
+                    onclick="selectAssignStaff(${s.id},'${s.name.replace(/'/g, "\\'")}','${s.uid||''}')">
+                    <td style="padding:6px 10px;"><b>${s.name}</b></td>
+                    <td style="padding:6px 10px;font-size:0.78rem;color:var(--text-muted);">${s.ic || '—'}</td>
+                    <td style="padding:6px 10px;font-size:0.78rem;"><span class="code">${s.uid || '—'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function selectAssignStaff(id, name, currentUid) {
+            assignSelectedId = id;
+            document.getElementById('assignMemberInfo').innerHTML =
+                `<strong>${name}</strong> — UID semasa: <span class="code">${currentUid || 'tiada'}</span>`;
+            filterAssignStaff();
+            document.getElementById('assignNfcInput').focus();
+        }
+
+        document.getElementById('assignNfcInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') submitAssignNfc();
+        });
+
+        async function submitAssignNfc() {
+            const uid = document.getElementById('assignNfcInput').value.trim();
+            if (!assignSelectedId) { showToast('Sila pilih pegawai dahulu', 'warning'); return; }
+            if (!uid) { showToast('Sila tap atau taip UID', 'warning'); return; }
+
+            try {
+                const data = await apiFetch('assign_uid', { staff_id: assignSelectedId, uid });
+                showToast(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    closeModal('assignNfcModal');
+                    loadStaff();
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        //  ADMIN
+        // ============================================================
+        async function checkAdminStatus() {
+            try {
+                const data = await apiFetch('admin_check');
+                if (data.logged_in) {
+                    document.getElementById('adminLogin').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    adminLoggedIn = true;
+                    await loadAdminData();
+                } else {
+                    document.getElementById('adminLogin').style.display = 'block';
+                    document.getElementById('adminPanel').style.display = 'none';
+                    adminLoggedIn = false;
+                    document.getElementById('terminateSection').style.display = 'none';
+                }
+            } catch (e) {
+                document.getElementById('adminLogin').style.display = 'block';
+                document.getElementById('adminPanel').style.display = 'none';
+            }
+        }
+
+        async function adminLogin() {
+            const pass = document.getElementById('adminPass').value;
+            try {
+                const data = await apiFetch('admin_login', { password: pass });
+                if (data.success) {
+                    showToast('Log masuk berjaya', 'success');
+                    checkAdminStatus();
+                } else {
+                    showToast(data.message || 'Kata laluan salah', 'error');
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        async function adminLogout() {
+            await apiFetch('admin_logout');
+            adminLoggedIn = false;
+            document.getElementById('terminateSection').style.display = 'none';
+            checkAdminStatus();
+            showToast('Log keluar', 'info');
+        }
+
+        async function loadAdminData() {
+            try {
+                const staffData = await apiFetch('get_staff');
+                adminStaffList = staffData.staff || [];
+                allStaff = adminStaffList;
+
+                const sessionData = await apiFetch('get_today_sessions');
+                const sessions = sessionData.sessions || [];
+                const active = sessions.filter(s => !s.check_out);
+                const done = sessions.filter(s => s.check_out);
+
+                document.getElementById('statTotal').textContent = adminStaffList.length;
+                document.getElementById('statAktif').textContent = active.length;
+                document.getElementById('statSelesai').textContent = done.length;
+                document.getElementById('statTerminated').textContent = adminStaffList.filter(s => s.terminated).length;
+
+                filterAdminStaff();
+                filterTerminateStaff();
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function filterAdminStaff() {
+            const q = document.getElementById('adminSearch').value.toLowerCase().trim();
+            const tbody = document.getElementById('adminStaffBody');
+            let filtered = adminStaffList;
+            if (q) filtered = filtered.filter(s =>
+                (s.name || '').toLowerCase().includes(q) ||
+                (s.ic || '').includes(q) ||
+                (s.uid || '').toLowerCase().includes(q)
+            );
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Tiada hasil carian</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(s => {
+                const termBadge = s.terminated ?
+                    '<span class="terminate-badge active">Ditamatkan</span>' :
+                    '<span class="terminate-badge inactive">Aktif</span>';
+                const checked = adminSelectedIds.includes(s.id) ? 'checked' : '';
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="staff-check" value="${s.id}" ${checked} onchange="toggleStaffSelect(${s.id})" /></td>
+                        <td><b>${s.name}</b></td>
+                        <td>${s.ic || '—'}</td>
+                        <td>${s.position || '—'}</td>
+                        <td><span class="code">${s.uid || '—'}</span></td>
+                        <td>${termBadge}</td>
+                        <td>${s.total_hours || '—'}</td>
+                        <td style="display:flex;gap:4px;flex-wrap:wrap;">
+                            <button class="btn btn-primary btn-sm" onclick="openEditStaff(${s.id})"><i class="fas fa-pen"></i></button>
+                            <button class="btn btn-danger btn-sm" onclick="openDeleteStaff(${s.id},'${s.name.replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleStaffSelect(id) {
+            const idx = adminSelectedIds.indexOf(id);
+            if (idx > -1) adminSelectedIds.splice(idx, 1);
+            else adminSelectedIds.push(id);
+        }
+
+        function toggleSelectAllStaff() {
+            const checked = document.getElementById('selectAllStaff').checked;
+            document.querySelectorAll('.staff-check').forEach(cb => {
+                cb.checked = checked;
+                const id = parseInt(cb.value);
+                if (checked) {
+                    if (!adminSelectedIds.includes(id)) adminSelectedIds.push(id);
+                } else {
+                    adminSelectedIds = adminSelectedIds.filter(x => x !== id);
+                }
+            });
+        }
+
+        function openDeleteStaff(id, name) {
+            document.getElementById('deleteStaffId').value = id;
+            document.getElementById('deleteStaffName').textContent = name;
+            openModal('deleteModal');
+        }
+
+        async function confirmDeleteStaff() {
+            const id = document.getElementById('deleteStaffId').value;
+            try {
+                const data = await apiFetch('delete_staff', { staff_id: id });
+                showToast(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    closeModal('deleteModal');
+                    loadAdminData();
+                    loadStaff();
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        async function deleteSelectedStaff() {
+            if (!adminSelectedIds.length) { showToast('Tiada pegawai dipilih', 'warning'); return; }
+            if (!confirm(`Padam ${adminSelectedIds.length} pegawai yang dipilih?`)) return;
+            try {
+                const data = await apiFetch('delete_staff_bulk', { ids: adminSelectedIds });
+                showToast(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    adminSelectedIds = [];
+                    loadAdminData();
+                    loadStaff();
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        // ===== EDIT STAFF =====
+        function openEditStaff(id) {
+            const s = adminStaffList.find(x => x.id === id);
+            if (!s) return;
+            document.getElementById('editStaffId').value = s.id;
+            document.getElementById('editName').value = s.name || '';
+            document.getElementById('editIc').value = s.ic || '';
+            document.getElementById('editPosition').value = s.position || '';
+            document.getElementById('editNfc').value = s.uid || '';
+            openModal('editStaffModal');
+        }
+
+        async function submitEditStaff() {
+            const id = document.getElementById('editStaffId').value;
+            const name = document.getElementById('editName').value.trim();
+            const ic = document.getElementById('editIc').value.trim();
+            const position = document.getElementById('editPosition').value.trim();
+            const uid = document.getElementById('editNfc').value.trim();
+            if (!name || !ic || !position || !uid) {
+                showToast('Sila lengkapkan semua maklumat', 'error');
+                return;
+            }
+            try {
+                const data = await apiFetch('update_staff', { staff_id: id, name, ic, position, uid });
+                showToast(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    closeModal('editStaffModal');
+                    loadAdminData();
+                    loadStaff();
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        // ===== DELETE ATTENDANCE BY PERIOD =====
+        async function deleteAttendanceByPeriod() {
+            const period = document.getElementById('deletePeriod').value;
+            const date = document.getElementById('deleteDate').value;
+            if (!date) { showToast('Sila pilih tarikh rujukan', 'warning'); return; }
+            if (!confirm(`Padam rekod kehadiran untuk tempoh ${period} (rujukan ${date})?`)) return;
+            try {
+                const data = await apiFetch('delete_attendance_by_period', { period, date });
+                showToast(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    loadTodaySessions();
+                    loadAdminData();
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        //  DOWNLOAD EXCEL
+        // ============================================================
+        let downloadPayload = null;
+
+        function downloadExcel() {
+            const period = document.getElementById('downloadPeriod').value;
+            const date = document.getElementById('downloadDate').value;
+            if (!date) { showToast('Sila pilih tarikh', 'warning'); return; }
+
+            downloadPayload = { period, date };
+            document.getElementById('downloadFilename').value = '';
+            openModal('downloadModal');
+            setTimeout(() => document.getElementById('downloadFilename').focus(), 200);
+        }
+
+        async function confirmDownload() {
+            let filename = document.getElementById('downloadFilename').value.trim();
+            if (!filename) {
+                const period = downloadPayload.period;
+                const date = downloadPayload.date;
+                const d = new Date(date + 'T00:00:00');
+                const month = d.toLocaleString('ms-MY', { month: 'long' });
+                const year = d.getFullYear();
+                if (period === 'harian') filename = `Kehadiran ${d.getDate()} ${month} ${year}`;
+                else if (period === 'mingguan') filename = `Kehadiran Minggu ${d.getDate()} ${month} ${year}`;
+                else if (period === 'bulanan') filename = `Kehadiran ${month} ${year}`;
+                else if (period === 'tahunan') filename = `Kehadiran ${year}`;
+                else filename = 'Laporan_Kehadiran';
+            }
+
+            closeModal('downloadModal');
+
+            try {
+                const data = await apiFetch('download_excel', {
+                    period: downloadPayload.period,
+                    date: downloadPayload.date,
+                    filename: filename
+                });
+
+                if (data.success && data.url) {
+                    window.open(data.url, '_blank');
+                    showToast('Muat turun dimulakan: ' + filename, 'success');
+                } else {
+                    showToast(data.message || 'Gagal muat turun', 'error');
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        //  HIDDEN TERMINATE MODE (Ctrl+Shift+T)
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'T') {
+                e.preventDefault();
+                toggleTerminateMode();
+            }
+        });
+
+        function toggleTerminateMode() {
+            if (!adminLoggedIn) {
+                showToast('Sila log masuk admin dahulu', 'warning');
+                return;
+            }
+            const section = document.getElementById('terminateSection');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                filterTerminateStaff();
+                showToast('Mode Terminate diaktifkan', 'info');
+            } else {
+                section.style.display = 'none';
+                showToast('Mode Terminate dilumpuhkan', 'info');
+            }
+        }
+
+        function filterTerminateStaff() {
+            const q = document.getElementById('terminateSearch').value.toLowerCase().trim();
+            const tbody = document.getElementById('terminateStaffBody');
+            let filtered = adminStaffList;
+            if (q) filtered = filtered.filter(s =>
+                (s.name || '').toLowerCase().includes(q) ||
+                (s.ic || '').includes(q) ||
+                (s.uid || '').toLowerCase().includes(q)
+            );
+            if (!filtered.length) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Tiada pegawai</td></tr>';
+                return;
+            }
+            tbody.innerHTML = filtered.map(s => {
+                const status = s.terminated ?
+                    '<span class="terminate-badge active">Ditamatkan</span>' :
+                    '<span class="terminate-badge inactive">Aktif</span>';
+                return `
+                    <tr>
+                        <td><b>${s.name}</b></td>
+                        <td>${s.ic || '—'}</td>
+                        <td>${s.position || '—'}</td>
+                        <td><span class="code">${s.uid || '—'}</span></td>
+                        <td>${status}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function confirmTerminate() {
+            const q = document.getElementById('terminateSearch').value.toLowerCase().trim();
+            let found = adminStaffList.filter(s =>
+                (s.name || '').toLowerCase().includes(q) ||
+                (s.ic || '').includes(q) ||
+                (s.uid || '').toLowerCase().includes(q)
+            );
+            if (!found.length) { showToast('Tiada pegawai dijumpai', 'warning'); return; }
+            if (found.length > 1) {
+                showToast(`Dijumpai ${found.length} pegawai. Sila spesifikkan carian.`, 'warning');
+                return;
+            }
+            const s = found[0];
+            if (s.terminated) { showToast('Pegawai ini sudah ditamatkan', 'warning'); return; }
+            document.getElementById('terminateStaffId').value = s.id;
+            document.getElementById('terminateStaffName').textContent = s.name;
+            openModal('terminateConfirmModal');
+        }
+
+        async function executeTerminate() {
+            const id = document.getElementById('terminateStaffId').value;
+            try {
+                const data = await apiFetch('terminate_staff', { staff_id: id });
+                showToast(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    closeModal('terminateConfirmModal');
+                    loadAdminData();
+                    loadStaff();
+                    filterTerminateStaff();
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        function confirmReactivate() {
+            const q = document.getElementById('terminateSearch').value.toLowerCase().trim();
+            let found = adminStaffList.filter(s =>
+                (s.name || '').toLowerCase().includes(q) ||
+                (s.ic || '').includes(q) ||
+                (s.uid || '').toLowerCase().includes(q)
+            );
+            if (!found.length) { showToast('Tiada pegawai dijumpai', 'warning'); return; }
+            if (found.length > 1) {
+                showToast(`Dijumpai ${found.length} pegawai. Sila spesifikkan carian.`, 'warning');
+                return;
+            }
+            const s = found[0];
+            if (!s.terminated) { showToast('Pegawai ini masih aktif', 'warning'); return; }
+            document.getElementById('reactivateStaffId').value = s.id;
+            document.getElementById('reactivateStaffName').textContent = s.name;
+            openModal('reactivateConfirmModal');
+        }
+
+        async function executeReactivate() {
+            const id = document.getElementById('reactivateStaffId').value;
+            try {
+                const data = await apiFetch('reactivate_staff', { staff_id: id });
+                showToast(data.message, data.success ? 'success' : 'error');
+                if (data.success) {
+                    closeModal('reactivateConfirmModal');
+                    loadAdminData();
+                    loadStaff();
+                    filterTerminateStaff();
+                }
+            } catch (e) {
+                showToast('Ralat: ' + e.message, 'error');
+            }
+        }
+
+        // ============================================================
+        //  PWA / INSTALL
+        // ============================================================
+        let deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').classList.add('show');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('installBanner').classList.remove('show');
+            showToast('KPWKM Attendance berjaya dipasang!', 'success');
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((result) => {
+                    if (result.outcome === 'accepted') {
+                        document.getElementById('installBanner').classList.remove('show');
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                showToast('Sila buka menggunakan Chrome atau Safari dan pilih "Add to Home Screen"', 'info');
+            }
+        }
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        document.getElementById('downloadDate').value = getToday();
+        document.getElementById('deleteDate').value = getToday();
+
+        loadLiveSessions();
+        loadStaff();
+
+        setInterval(() => {
+            if (document.getElementById('page-scan').classList.contains('active')) {
+                loadLiveSessions();
+            }
+            if (document.getElementById('page-admin').classList.contains('active') && adminLoggedIn) {
+                loadAdminData();
+            }
+        }, 30000);
+
+        document.getElementById('adminPass').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') adminLogin();
+        });
+
+        console.log('KPWKM Attendance System loaded.');
+        console.log('Hidden mode: Ctrl+Shift+T (admin only)');
+    </script>
+
+</body>
+</html>
