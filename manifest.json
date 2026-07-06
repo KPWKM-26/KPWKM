@@ -1,0 +1,39 @@
+{
+  "name": "KPWKM Attendance",
+  "short_name": "KPWKM",
+  "description": "Sistem Kehadiran Rasmi KPWKM",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f2f6fc",
+  "theme_color": "#0a2f6c",
+  "lang": "ms",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "maskable"
+    },
+    {
+      "src": "https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "maskable"
+    }
+  ]
+}
