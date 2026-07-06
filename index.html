@@ -9,6 +9,10 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="apple-touch-icon" href="https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp" />
+    <link rel="apple-touch-icon" sizes="192x192" href="https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp" />
+    <link rel="icon" type="image/webp" sizes="192x192" href="https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp" />
+    <link rel="icon" type="image/webp" sizes="512x512" href="https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp" />
+    <link rel="shortcut icon" href="https://media.freemalaysiatoday.com/wp-content/uploads/2025/05/d3e7c390-logo-kpwkm-150525.webp" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
@@ -83,8 +87,9 @@
             margin-bottom: 12px;
         }
         .logo-center img {
-            height: 150px;
+            height: 130px;
             width: auto;
+            max-width: 90%;
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.1);
             padding: 6px;
@@ -575,6 +580,12 @@
             gap: 7px;
             white-space: nowrap;
         }
+        .btn:disabled,
+        .btn.is-loading {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none !important;
+        }
         .btn-primary {
             background: var(--kpwkm);
             color: #fff;
@@ -801,7 +812,7 @@
                 padding: 12px 14px 8px;
             }
             .logo-center img {
-                height: 60px;
+                height: 95px;
             }
             .logo-center h1 {
                 font-size: 1.4rem;
@@ -841,7 +852,7 @@
         }
         @media(max-width:480px) {
             .logo-center img {
-                height: 48px;
+                height: 75px;
             }
             .logo-center h1 {
                 font-size: 1.1rem;
@@ -985,10 +996,16 @@
         </div>
     </header>
 
-    <!-- ===== INSTALL BANNER ===== -->
+    <!-- ===== INSTALL BANNER (Android) ===== -->
     <div class="install-banner" id="installBanner">
         <p><i class="fas fa-mobile-screen-button"></i> Install KPWKM Attendance untuk akses pantas</p>
         <button class="btn btn-sm" onclick="installApp()"><i class="fas fa-download"></i> Install</button>
+    </div>
+
+    <!-- ===== INSTALL BUTTON (Desktop: Chrome/Edge) ===== -->
+    <div class="install-banner" id="installBannerDesktop">
+        <p><i class="fas fa-desktop"></i> Pasang KPWKM Attendance sebagai aplikasi</p>
+        <button class="btn btn-sm" id="installBtnDesktop" onclick="installApp()"><i class="fas fa-download"></i> Install App</button>
     </div>
 
     <!-- ===== MAIN ===== -->
@@ -1046,7 +1063,7 @@
                     </div>
                 </div>
                 <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
-                    <button class="btn btn-primary" onclick="registerStaff()"><i class="fas fa-plus-circle"></i> Daftar Sekarang</button>
+                    <button class="btn btn-primary" id="registerBtn" onclick="registerStaff()"><i class="fas fa-plus-circle" id="registerBtnIcon"></i> <span id="registerBtnText">Daftar Sekarang</span></button>
                     <button class="btn btn-success" onclick="openBulkRegisterModal()"><i class="fas fa-file-upload"></i> Daftar Sekaligus</button>
                     <button class="btn btn-warning" onclick="openAssignNfcModal()"><i class="fas fa-id-card"></i> Setkan UID</button>
                 </div>
@@ -1361,6 +1378,21 @@
         </div>
     </div>
 
+    <!-- iOS Install Instructions Modal -->
+    <div class="modal-overlay" id="iosInstallModal">
+        <div class="modal">
+            <div class="modal-title"><i class="fas fa-mobile-screen-button"></i> Install Aplikasi Ini</div>
+            <p style="line-height:1.9;font-size:0.92rem;">
+                Install aplikasi ini pada iPhone anda dengan:<br />
+                1. Tekan butang <b><i class="fas fa-arrow-up-from-bracket"></i> Share</b> pada Safari<br />
+                2. Pilih <b>Add to Home Screen</b>
+            </p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="dismissIosInstallModal()">Faham</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== TOAST ===== -->
     <div id="toast"></div>
 
@@ -1371,7 +1403,7 @@
         // ============================================================
         const CONFIG = {
             // GANTI dengan URL Google Apps Script Web App anda
-            API_BASE: 'https://script.google.com/macros/s/AKfycbwyuP82cfqSf4iFCtq0ZORvSWMjtpual2E3wEJa8PPDW2hsO-pILgw4eNe1_2gCwYMxTg/exec'
+            API_BASE: 'https://script.google.com/macros/s/AKfycbzwWOJESiQQ0qjBK3x013nOkv4OjsMAu2i9AODpP5F_iqqi3VJuWawT8i5nL7jN3RYFug/exec'
         };
 
         // ============================================================
@@ -1445,9 +1477,14 @@
 
         function apiFetch(action, body = {}) {
             const url = CONFIG.API_BASE + '?action=' + encodeURIComponent(action);
+            // NOTA: Content-Type sengaja 'text/plain' (bukan 'application/json') supaya
+            // browser anggap ini "simple request" dan TIDAK hantar preflight OPTIONS.
+            // Google Apps Script web app tidak pernah balas OPTIONS, jadi guna
+            // application/json di sini akan menyebabkan ralat CORS/Failed to fetch.
+            // Code.gs tetap boleh JSON.parse(e.postData.contents) seperti biasa.
             return fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify(body)
             }).then(r => r.json());
         }
@@ -1685,7 +1722,11 @@
         // ============================================================
         //  REGISTER STAFF
         // ============================================================
+        let isRegisteringStaff = false;
+
         async function registerStaff() {
+            if (isRegisteringStaff) return; // halang double submit
+
             const name = document.getElementById('regName').value.trim();
             const ic = document.getElementById('regIc').value.trim();
             const position = document.getElementById('regPosition').value.trim();
@@ -1695,6 +1736,16 @@
                 showToast('Sila lengkapkan semua maklumat', 'error');
                 return;
             }
+
+            const btn = document.getElementById('registerBtn');
+            const btnIcon = document.getElementById('registerBtnIcon');
+            const btnText = document.getElementById('registerBtnText');
+
+            isRegisteringStaff = true;
+            btn.disabled = true;
+            btn.classList.add('is-loading');
+            btnIcon.className = 'fas fa-spinner fa-spin';
+            btnText.textContent = 'Sedang Mendaftar...';
 
             try {
                 const data = await apiFetch('register_staff', { name, ic, position, uid });
@@ -1712,6 +1763,12 @@
                 }
             } catch (e) {
                 showToast('Ralat: ' + e.message, 'error');
+            } finally {
+                isRegisteringStaff = false;
+                btn.disabled = false;
+                btn.classList.remove('is-loading');
+                btnIcon.className = 'fas fa-plus-circle';
+                btnText.textContent = 'Daftar Sekarang';
             }
         }
 
@@ -2271,14 +2328,33 @@
         // ============================================================
         let deferredPrompt = null;
 
+        function isStandaloneMode() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                window.navigator.standalone === true;
+        }
+        function isIOSDevice() {
+            return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+        }
+        function isAndroidDevice() {
+            return /android/i.test(navigator.userAgent);
+        }
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
+            if (isStandaloneMode()) return; // sudah dipasang, jangan papar apa-apa
             deferredPrompt = e;
-            document.getElementById('installBanner').classList.add('show');
+            if (isAndroidDevice()) {
+                document.getElementById('installBanner').classList.add('show');
+            } else {
+                // Desktop Chrome/Edge
+                document.getElementById('installBannerDesktop').classList.add('show');
+            }
         });
 
         window.addEventListener('appinstalled', () => {
             document.getElementById('installBanner').classList.remove('show');
+            document.getElementById('installBannerDesktop').classList.remove('show');
+            deferredPrompt = null;
             showToast('KPWKM Attendance berjaya dipasang!', 'success');
         });
 
@@ -2288,12 +2364,43 @@
                 deferredPrompt.userChoice.then((result) => {
                     if (result.outcome === 'accepted') {
                         document.getElementById('installBanner').classList.remove('show');
+                        document.getElementById('installBannerDesktop').classList.remove('show');
                     }
                     deferredPrompt = null;
                 });
             } else {
                 showToast('Sila buka menggunakan Chrome atau Safari dan pilih "Add to Home Screen"', 'info');
             }
+        }
+
+        // ----- iOS Safari Add-to-Home-Screen popup -----
+        function dismissIosInstallModal() {
+            closeModal('iosInstallModal');
+            try {
+                localStorage.setItem('kpwkmIosInstallDismissedAt', String(Date.now()));
+            } catch (e) { /* localStorage tidak tersedia, abaikan */ }
+        }
+
+        function maybeShowIosInstallPrompt() {
+            if (!isIOSDevice() || isStandaloneMode()) return;
+            const isSafari = /safari/i.test(navigator.userAgent) && !/crios|fxios|edgios/i.test(navigator.userAgent);
+            if (!isSafari) return;
+            let dismissedAt = 0;
+            try {
+                dismissedAt = parseInt(localStorage.getItem('kpwkmIosInstallDismissedAt') || '0', 10);
+            } catch (e) { /* abaikan */ }
+            const THREE_DAYS = 3 * 24 * 60 * 60 * 1000;
+            if (dismissedAt && (Date.now() - dismissedAt) < THREE_DAYS) return;
+            openModal('iosInstallModal');
+        }
+
+        // Jika sudah dibuka sebagai app terpasang (standalone), pastikan semua
+        // elemen install disembunyikan dan jangan langgan sebarang prompt lagi.
+        if (isStandaloneMode()) {
+            document.getElementById('installBanner').classList.remove('show');
+            document.getElementById('installBannerDesktop').classList.remove('show');
+        } else {
+            maybeShowIosInstallPrompt();
         }
 
         // ============================================================
@@ -2322,6 +2429,17 @@
 
         console.log('KPWKM Attendance System loaded.');
         console.log('Hidden mode: Ctrl+Shift+T (admin only)');
+
+        // ============================================================
+        //  SERVICE WORKER REGISTRATION
+        // ============================================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').catch((err) => {
+                    console.log('Service worker gagal didaftarkan:', err);
+                });
+            });
+        }
     </script>
 
 </body>
